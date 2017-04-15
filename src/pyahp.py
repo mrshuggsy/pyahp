@@ -25,37 +25,74 @@ class AHP(object):
             self.criteria.append(crit)
 
 
-    def comp_criteria(self):
-        """Goes through the ranking process for the criteria"""
-        for crit_row in self.criteria:
-            print('Possible relations: {0}'.format(self.weights.keys()))
-            self.criteria_ranks[crit_row] = dict()
+    def _rank_items(self, items):
+        pass
 
-            for crit_col in self.criteria:
-                if crit_col == crit_row:
-                    this_ranking = '0'
-                else:
-                    this_ranking = None
 
-                while this_ranking not in self.weights:
-                    print('What is the relation of {0} vs. {1}?'.format(
-                        crit_row, crit_col
-                    ))
+    def _get_rank_input(self, item1, item2, criteria=None):
+        if criteria:
+            # Should do something different if we're ranking within the context of some criteria
+            pass
 
-                    this_ranking = input()
-                    if this_ranking not in self.weights:
-                        print('Invalid relation. Possible relations: {0}'.format(
-                            self.weights.keys()
-                        ))
+        if item1 == item2:
+            this_ranking = '0'
+        else:
+            this_ranking = None
 
-                self.criteria_ranks[crit_row][crit_col] = this_ranking
+        while this_ranking not in self.weights:
+            print('What is the relation of {0} vs. {1}?'.format(
+                item1, item2
+            ))
+
+            this_ranking = input()
+            if this_ranking not in self.weights:
+                print('Invalid relation. Possible relations: {0}'.format(
+                    self.weights.keys()
+                ))
+
+        return self.weights[this_ranking]
+
+
+    def _set_rank_value(self, item1, item2, value):
+        pass
+
+
+    def _make_weights_str(self):
+        temp_str = ''
+        for weight in self.weights:
+            temp_str += "'" + weight + "'" + '=' + \
+                        str(round(self.weights[weight], ndigits=3)) + ' | '
+        return temp_str[0:-3]
+
+
+    def rank_criteria(self):
+        """Goes through the ranking process for the criteria from a blank ranking matrix"""
+        ranking_sentinel = 0
+        for criteria in self.criteria:
+            self.criteria_ranks[criteria] = dict()
+
+        for crit_row in range(len(self.criteria)):
+            print('Possible relations: {0}'.format(self._make_weights_str()))
+            ranking_sentinel += 1
+
+            for crit_col in range(0, ranking_sentinel):
+                rank_val = self._get_rank_input(self.criteria[crit_row], self.criteria[crit_col])
+                self.criteria_ranks[self.criteria[crit_row]][self.criteria[crit_col]] = rank_val
+                self.criteria_ranks[self.criteria[crit_col]][self.criteria[crit_row]] = 1/rank_val
 
         for row in self.criteria_ranks:
             print(self.criteria_ranks[row])
 
+
+    def print_criteria_matrix(self):
+        """Method to pretty-print the matrix of criteria rankings"""
+        for row in self.criteria_ranks:
+            row_str = str(row)
+            print(row_str)
+
+
 if __name__ == '__main__':
     COMP = AHP()
-
     COMP.add_criteria('Color', 'Weight', 'Cost')
-
-    COMP.comp_criteria()
+    COMP.rank_criteria()
+    COMP.print_criteria_matrix()
