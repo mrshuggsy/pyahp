@@ -19,9 +19,9 @@ class AHP(object):
         self.criteria_ranks = dict()
         self.alternative_ranks = dict()
 
-    def add_criteria(self, *criteria):
+    def add_criteria(self, *_criteria):
         """Adds criteria to the AHP analysis"""
-        for crit in criteria:
+        for crit in _criteria:
             self.criteria.append(crit)
 
 
@@ -29,20 +29,24 @@ class AHP(object):
         pass
 
 
-    def _get_rank_input(self, item1, item2, criteria=None):
-        if criteria:
-            # Should do something different if we're ranking within the context of some criteria
-            pass
-
+    def _get_rank_input(self, item1, item2, _criteria=None):
         if item1 == item2:
             this_ranking = '0'
         else:
             this_ranking = None
 
-        while this_ranking not in self.weights:
-            print('What is the relation of {0} vs. {1}?'.format(
+        if _criteria:
+            rank_question_str = 'Within the context of {0}, '.format(_criteria) + \
+                                'what is the relation of {0} vs. {1}?'.format(
+                                    item1, item2
+                                )
+        else:
+            rank_question_str = 'What is the relation of {0} vs. {1}?'.format(
                 item1, item2
-            ))
+            )
+
+        while this_ranking not in self.weights:
+            print(rank_question_str)
 
             this_ranking = input()
             if this_ranking not in self.weights:
@@ -80,15 +84,44 @@ class AHP(object):
                 self.criteria_ranks[self.criteria[crit_row]][self.criteria[crit_col]] = rank_val
                 self.criteria_ranks[self.criteria[crit_col]][self.criteria[crit_row]] = 1/rank_val
 
-        for row in self.criteria_ranks:
-            print(self.criteria_ranks[row])
+
+    def rank_options(self):
+        """Goes through the ranking process for the alternatives within each criteria
+           starting from a blank matrix"""
+        ranking_sentinel = 0
+        for this_criteria in self.criteria:
+            self.alternative_ranks[this_criteria] = dict()
+
+            for alt_row in range(len(self.alternatives)):
+                print('Possble relations: {0}'.format(self._make_weights_str()))
+                self.alternative_ranks[this_criteria][self.alternatives[alt_row]] = dict()
+                ranking_sentinel += 1
+
+                for alt_col in range(0, ranking_sentinel):
+                    rank_val = self._get_rank_input(
+                        self.alternatives[alt_row], self.alternatives[alt_row],
+                        _criteria=this_criteria
+                    )
+                    self.alternative_ranks[this_criteria] \
+                        [self.alternatives[alt_row]][self.alternatives[alt_col]] = rank_val
+                    self.alternative_ranks[this_criteria] \
+                        [self.alternatives[alt_col]][self.alternatives[alt_row]] = rank_val
 
 
     def print_criteria_matrix(self):
         """Method to pretty-print the matrix of criteria rankings"""
-        for row in self.criteria_ranks:
-            row_str = str(row)
-            print(row_str)
+        for row, crit in (self.criteria_ranks, self.criteria):
+            temp_str = '{0}: '.format(crit) + self.criteria_ranks[row]
+            print(temp_str)
+
+
+    def print_alternatives_matrices(self):
+        """Method to pretty-print the matrices of alternatives in the context of each
+           criteria rankings"""
+        for crit in self.criteria:
+            print("For the '{0}' critiera:".format(crit))
+
+            #for
 
 
 if __name__ == '__main__':
