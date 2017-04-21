@@ -1,7 +1,8 @@
 """ This is an implementation of the Analytic Hierarchy Process (AHP)
     in Python
 """
-import math
+# import math
+
 
 class AHP(object):
     """ This class implements the AHP data structure and provides
@@ -24,16 +25,13 @@ class AHP(object):
         for crit in _criteria:
             self.criteria.append(crit)
 
-
     def add_alternative(self, *_alternative):
         """Adds one or more alternatives to the AHP analysis"""
         for alt in _alternative:
             self.alternatives.append(alt)
 
-
     def _rank_items(self, items):
         pass
-
 
     def _get_rank_input(self, item1, item2, _criteria=None):
         if item1 == item2:
@@ -62,10 +60,8 @@ class AHP(object):
 
         return self.weights[this_ranking]
 
-
     def _set_rank_value(self, item1, item2, value):
         pass
-
 
     def _make_weights_str(self):
         temp_str = ''
@@ -73,7 +69,6 @@ class AHP(object):
             temp_str += "'" + weight + "'" + '=' + \
                         str(round(self.weights[weight], ndigits=3)) + ' | '
         return temp_str[0:-3]
-
 
     def rank_criteria(self, values=None):
         """Goes through the ranking process for the criteria from a blank ranking matrix"""
@@ -97,7 +92,6 @@ class AHP(object):
                 self.criteria_ranks[self.criteria[crit_row]][self.criteria[crit_col]] = rank_val
                 self.criteria_ranks[self.criteria[crit_col]][self.criteria[crit_row]] = 1/rank_val
 
-
     def rank_alternatives(self):
         """Goes through the ranking process for the alternatives within each criteria
            starting from a blank matrix"""
@@ -120,13 +114,11 @@ class AHP(object):
                     self.alternative_ranks[this_criteria] \
                         [self.alternatives[alt_col]][self.alternatives[alt_row]] = rank_val
 
-
     def print_criteria_matrix(self):
         """Method to pretty-print the matrix of criteria rankings"""
         for row, crit in (self.criteria_ranks, self.criteria):
             temp_str = '{0}: '.format(crit) + self.criteria_ranks[row]
             print(temp_str)
-
 
     def print_alternatives_matrices(self):
         """Method to pretty-print the matrices of alternatives in the context of each
