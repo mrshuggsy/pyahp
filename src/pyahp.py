@@ -2,6 +2,8 @@
     in Python
 """
 # import math
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 class AHP(object):
@@ -15,7 +17,7 @@ class AHP(object):
         if weights:
             self.weights = dict(weights)
         else:
-            self.weights = {'-2': 1/9.0, '-1': 1/3.0, '0': 1, '1':3, '2':9}
+            self.weights = {'-2': 1/9.0, '-1': 1/3.0, '0': 1, '1': 3, '2': 9}
 
         self.criteria_ranks = dict()
         self.alternative_ranks = dict()
@@ -74,7 +76,7 @@ class AHP(object):
         """Goes through the ranking process for the criteria from a blank ranking matrix"""
         ranking_sentinel = 0
         if values is not None:
-            values = values.reverse()
+            values.reverse()
 
         for criteria in self.criteria:
             self.criteria_ranks[criteria] = dict()
@@ -85,7 +87,16 @@ class AHP(object):
 
             for crit_col in range(0, ranking_sentinel):
                 if values is not None:
-                    rank_val = values.pop()
+                    if crit_col == crit_row:
+                        rank_val = self.weights['0']
+                    else:
+                        logging.info('Ranking {0} vs. {1} as {2}: {3}'.format(
+                            self.criteria[crit_row],
+                            self.criteria[crit_col],
+                            values[0],
+                            self.weights[str(values[0])]
+                        ))
+                        rank_val = self.weights[str(values.pop())]
                 else:
                     rank_val = self._get_rank_input(self.criteria[crit_row],
                                                     self.criteria[crit_col])
@@ -96,8 +107,11 @@ class AHP(object):
         """Goes through the ranking process for the alternatives within each criteria
            starting from a blank matrix"""
         ranking_sentinel = 0
+
         for this_criteria in self.criteria:
             self.alternative_ranks[this_criteria] = dict()
+            for alt in self.alternatives:
+                self.alternative_ranks[this_criteria][alt] = dict()
 
             for alt_row in range(len(self.alternatives)):
                 print('Possble relations: {0}'.format(self._make_weights_str()))
@@ -105,14 +119,22 @@ class AHP(object):
                 ranking_sentinel += 1
 
                 for alt_col in range(0, ranking_sentinel):
+                    # TODO: Fix why _get_rank_input doesn't ask for rank during alternatives rankings
                     rank_val = self._get_rank_input(
                         self.alternatives[alt_row], self.alternatives[alt_row],
                         _criteria=this_criteria
                     )
+                    print('Context: {0} | {1} vs. {2} = {3}'.format(
+                        this_criteria,
+                        self.alternatives[alt_row],
+                        self.alternatives[alt_col],
+                        rank_val
+                    ))
+                    # TODO: Fix alternatives rankings
                     self.alternative_ranks[this_criteria] \
                         [self.alternatives[alt_row]][self.alternatives[alt_col]] = rank_val
                     self.alternative_ranks[this_criteria] \
-                        [self.alternatives[alt_col]][self.alternatives[alt_row]] = rank_val
+                        [self.alternatives[alt_col]][self.alternatives[alt_row]] = 1/rank_val
 
     def print_criteria_matrix(self):
         """Method to pretty-print the matrix of criteria rankings"""
