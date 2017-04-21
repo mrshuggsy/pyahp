@@ -20,9 +20,15 @@ class AHP(object):
         self.alternative_ranks = dict()
 
     def add_criteria(self, *_criteria):
-        """Adds criteria to the AHP analysis"""
+        """Adds one or more criteria to the AHP analysis"""
         for crit in _criteria:
             self.criteria.append(crit)
+
+
+    def add_alternative(self, *_alternative):
+        """Adds one or more alternatives to the AHP analysis"""
+        for alt in _alternative:
+            self.alternatives.append(alt)
 
 
     def _rank_items(self, items):
@@ -69,9 +75,12 @@ class AHP(object):
         return temp_str[0:-3]
 
 
-    def rank_criteria(self):
+    def rank_criteria(self, values=None):
         """Goes through the ranking process for the criteria from a blank ranking matrix"""
         ranking_sentinel = 0
+        if values is not None:
+            values = values.reverse()
+
         for criteria in self.criteria:
             self.criteria_ranks[criteria] = dict()
 
@@ -80,12 +89,16 @@ class AHP(object):
             ranking_sentinel += 1
 
             for crit_col in range(0, ranking_sentinel):
-                rank_val = self._get_rank_input(self.criteria[crit_row], self.criteria[crit_col])
+                if values is not None:
+                    rank_val = values.pop()
+                else:
+                    rank_val = self._get_rank_input(self.criteria[crit_row],
+                                                    self.criteria[crit_col])
                 self.criteria_ranks[self.criteria[crit_row]][self.criteria[crit_col]] = rank_val
                 self.criteria_ranks[self.criteria[crit_col]][self.criteria[crit_row]] = 1/rank_val
 
 
-    def rank_options(self):
+    def rank_alternatives(self):
         """Goes through the ranking process for the alternatives within each criteria
            starting from a blank matrix"""
         ranking_sentinel = 0
@@ -121,11 +134,15 @@ class AHP(object):
         for crit in self.criteria:
             print("For the '{0}' critiera:".format(crit))
 
-            #for
+            for opt in self.alternative_ranks[crit]:
+                temp_str = '{0}: '.format(opt) + self.alternative_ranks[opt]
+                print(temp_str)
 
 
 if __name__ == '__main__':
     COMP = AHP()
     COMP.add_criteria('Color', 'Weight', 'Cost')
-    COMP.rank_criteria()
+    COMP.add_alternative('Widget A', 'Widget B')
+    COMP.rank_criteria(values=[2, -1, 1])
+    COMP.rank_alternatives()
     COMP.print_criteria_matrix()
