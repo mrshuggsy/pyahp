@@ -90,13 +90,14 @@ class AHP(object):
                     if crit_col == crit_row:
                         rank_val = self.weights['0']
                     else:
-                        logging.info('Ranking {0} vs. {1} as {2}: {3}'.format(
-                            self.criteria[crit_row],
-                            self.criteria[crit_col],
-                            values[0],
-                            self.weights[str(values[0])]
-                        ))
+                        logging.info('Ranking %s vs. %s as %s: %s',
+                                     self.criteria[crit_row],
+                                     self.criteria[crit_col],
+                                     values[0],
+                                     self.weights[str(values[0])]
+                                    )
                         rank_val = self.weights[str(values.pop())]
+                        # TODO: Try/catch on the rank_val pop above
                 else:
                     rank_val = self._get_rank_input(self.criteria[crit_row],
                                                     self.criteria[crit_col])
@@ -119,7 +120,7 @@ class AHP(object):
                 ranking_sentinel += 1
 
                 for alt_col in range(0, ranking_sentinel):
-                    # TODO: Fix why _get_rank_input doesn't ask for rank during alternatives rankings
+                    # TODO: Fix: _get_rank_input doesn't ask for rank during alternatives rankings
                     rank_val = self._get_rank_input(
                         self.alternatives[alt_row], self.alternatives[alt_row],
                         _criteria=this_criteria
