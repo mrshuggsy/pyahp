@@ -12,9 +12,9 @@ class AHP(object):
     """
 
     def __init__(self, criteria=None, alternatives=None, weights=None):
-        self.criteria = list(criteria) if criteria else []
-        self.alternatives = list(alternatives) if alternatives else []
-        if weights:
+        self.criteria = list(criteria) if criteria is not None else []
+        self.alternatives = list(alternatives) if alternatives is not None else []
+        if weights is not None:
             self.weights = dict(weights)
         else:
             self.weights = {'-2': 1/9.0, '-1': 1/3.0, '0': 1, '1': 3, '2': 9}
